@@ -3,6 +3,7 @@ package conjuntoDeValores;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +14,7 @@ import javax.swing.SwingUtilities;
 import calculadora.Calculadora;
 
 public class Main implements ActionListener {
+	Acoes acoes = new Acoes();
 	JLabel label;
 	JTextField valor;
 	JButton adicionar;
@@ -69,21 +71,18 @@ public class Main implements ActionListener {
 			@Override
 			public void run() {
 				new Main();
-
 			}
 		});
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Acoes acoes = new Acoes();
 
-		if (e.getActionCommand() == "adicionar")
+		if (e.getActionCommand() == "adicionar") {
 
 			acoes.adicionar(Integer.parseInt(valor.getText().trim()));
 
-		else if (e.getActionCommand() == "calcular") {
+		} else if (e.getActionCommand() == "calcular") {
 			maior.setText(acoes.verificaMaior());
 
 			menor.setText(acoes.verificaMenor());
