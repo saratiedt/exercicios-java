@@ -1,17 +1,20 @@
 package anotacoes;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -20,25 +23,24 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 public class Main implements ListSelectionListener, ActionListener {
-	Acoes acoes = new Acoes();
 	JLabel label = new JLabel();
-	JTextField titulo = new JTextField();
+	JLabel label2 = new JLabel();
+	JTextField titulo = new JTextField(35);
 	JTextArea descricao = new JTextArea();
-	JPanel panel = new JPanel();
+	JPanel panel = new JPanel(new BorderLayout());
 	JButton adiconar = new JButton("Adicionar");
 	JButton remover = new JButton("Remover");
 	Anotacao anotacao = new Anotacao("titulo", "descricao");
 	Anotacao[] anotacoes = { anotacao };
-	DefaultListModel listModel;
-	JList lista;
+	DefaultListModel<Anotacao> listModel;
+	JList<Anotacao> lista;
 
 	public Main() {
-		listModel = new DefaultListModel();
-		panel.setLayout(new GridLayout(6, 2, 5, 5));
+		JPanel grid = new JPanel(new GridLayout(0, 1));
+		listModel = new DefaultListModel<Anotacao>();
+		listModel.addElement(new Anotacao("titulo de exemplo", "descrição de exemplo"));
 
-		System.out.println(anotacao);
-
-		lista = new JList(listModel);
+		lista = new JList<Anotacao>(listModel);
 
 		JFrame frame = new JFrame("Anotações");
 		frame.setVisible(true);
@@ -46,23 +48,40 @@ public class Main implements ListSelectionListener, ActionListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		lista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-		lista.setPreferredSize(new Dimension(150, 300));
+		frame.add(lista, BorderLayout.WEST);
 
 		label = new JLabel("Titulo");
 
-		panel.add(lista);
-		panel.add(label);
-		panel.add(label);
-		panel.add(titulo);
-		panel.add(descricao);
-		frame.add(panel);
-		panel.add(adiconar);
-		panel.add(remover);
-		
+		JPanel esquerda = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		esquerda.add(label);
+
+		grid.add(esquerda);
+
+		esquerda = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		esquerda.add(titulo);
+
+		grid.add(esquerda);
+
+		panel.add(grid, BorderLayout.NORTH);
+
+		JScrollPane scrol = new JScrollPane(descricao);
+
+		label2 = new JLabel("Descricao");
+		grid.add(label2);
+
+		panel.add(scrol, BorderLayout.CENTER);
+
+		esquerda = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		esquerda.add(adiconar);
+		esquerda.add(remover);
+
+		panel.add(esquerda, BorderLayout.SOUTH);
+
 		adiconar.addActionListener(this);
+		remover.addActionListener(this);
 
 		lista.addListSelectionListener(this);
+		frame.add(panel, BorderLayout.CENTER);
 
 	}
 
@@ -78,20 +97,39 @@ public class Main implements ListSelectionListener, ActionListener {
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
+		if (lista.getSelectedIndex() != -1) {
+			lista.getSelectedValue();
+			titulo.setText(lista.getSelectedValue().getTitulo());
+			descricao.setText(lista.getSelectedValue().getDescricao());
+		}
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand() == "Adicionar") {
-			listModel = acoes.adicionar(titulo.getText().trim(), descricao.getText().trim());
-			for (int i = 0; i < lista.getModel().getSize(); i++) {
-				System.out.println(lista.getModel().getElementAt(i));
+		if (e.getActionCommand().equalsIgnoreCase("Adicionar")) {
+
+			if (lista.getSelectedIndex() != -1) {
+				listModel.set(lista.getSelectedIndex(), new Anotacao(titulo.getText(), descricao.getText()));
+				lista.clearSelection();
+				titulo.setText("");
+				descricao.setText("");
+			} else {
+				listModel.addElement(new Anotacao(titulo.getText(), descricao.getText()));
+				lista.clearSelection();
+				titulo.setText("");
+				descricao.setText("");
 			}
-			
-		} else if (e.getActionCommand().equals("Remover")) {
-			acoes.remover(titulo.getText().trim());
+
+		} else if (e.getActionCommand().equalsIgnoreCase("Remover")) {
+
+			if (lista.getSelectedIndex() != -1) {
+				listModel.removeElementAt(lista.getSelectedIndex());
+				lista.clearSelection();
+				titulo.setText("");
+				descricao.setText("");
+			}
+
 		}
 
 	}
